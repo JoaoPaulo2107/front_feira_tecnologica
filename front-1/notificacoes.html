@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificações — Feira Tech MCM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+/* ========== RESET & BASE ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --primary: #1a56db;
+    --primary-dark: #1340a0;
+    --primary-light: #e8effe;
+    --secondary: #0ea5e9;
+    --accent: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 14px rgba(0,0,0,.08);
+    --sidebar-w: 250px;
+    --header-h: 64px;
+    --transition: .2s ease;
+}
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-800); }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+input, textarea, select { font-family: inherit; outline: none; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); padding: 10px 14px; font-size: .9rem; width: 100%; transition: var(--transition); background: #fff; }
+input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,86,219,.15); }
+textarea { resize: vertical; min-height: 80px; }
+img { max-width: 100%; display: block; }
+.hidden { display: none !important; }
+
+/* ========== LOGIN SCREEN ========== */
+#login-screen {
+    position: fixed; inset: 0; z-index: 9999; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0ea5e9 100%);
+}
+.login-card {
+    background: #fff; border-radius: 20px; padding: 48px 40px 40px;
+    width: 420px; max-width: 94vw; box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    text-align: center;
+}
+.login-card .logo-icon {
+    width: 64px; height: 64px; background: var(--primary); border-radius: 16px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-size: 28px;
+}
+.login-card h1 { font-size: 1.5rem; font-weight: 700; color: var(--gray-900); }
+.login-card p { color: var(--gray-500); font-size: .9rem; margin: 4px 0 28px; }
+.login-card .form-group { text-align: left; margin-bottom: 18px; }
+.login-card .form-group label { display: block; font-weight: 600; font-size: .85rem; color: var(--gray-700); margin-bottom: 5px; }
+.login-card .form-group label i { margin-right: 6px; color: var(--primary); }
+.login-card .btn-primary { width: 100%; padding: 13px; font-size: 1rem; font-weight: 600; border-radius: var(--radius-sm); background: var(--primary); color: #fff; transition: var(--transition); margin-top: 6px; }
+.login-card .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.login-card .login-footer { margin-top: 18px; font-size: .85rem; color: var(--gray-400); }
+.login-card .login-footer a { color: var(--primary); font-weight: 600; }
+.login-error { color: var(--red); font-size: .85rem; margin-top: 10px; display: none; }
+
+/* ========== APP LAYOUT ========== */
+#app { display: flex; min-height: 100vh; }
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+    width: var(--sidebar-w); background: var(--gray-900); color: #fff;
+    display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+    transition: transform var(--transition); z-index: 100;
+}
+.sidebar-header {
+    height: var(--header-h); display: flex; align-items: center; gap: 12px;
+    padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-header .brand-icon {
+    width: 36px; height: 36px; background: var(--primary); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.sidebar-header h2 { font-size: .95rem; font-weight: 600; line-height: 1.2; }
+.sidebar-header span { font-size: .7rem; color: var(--gray-400); display: block; }
+.sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.sidebar-nav a {
+    display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+    border-radius: var(--radius-sm); color: var(--gray-300); font-size: .88rem; font-weight: 500;
+    transition: var(--transition); margin-bottom: 2px;
+}
+.sidebar-nav a i:first-child { width: 20px; text-align: center; font-size: 1rem; }
+.sidebar-nav a:hover { background: rgba(255,255,255,.07); color: #fff; }
+.sidebar-nav a.active { background: var(--primary); color: #fff; }
+.sidebar-nav .nav-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-500); padding: 16px 14px 6px; font-weight: 600; }
+.sidebar-nav .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: .65rem; padding: 2px 8px; border-radius: 10px; }
+.sidebar-footer { padding: 14px 10px; border-top: 1px solid rgba(255,255,255,.08); }
+.sidebar-footer .user-card {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+    border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
+}
+.sidebar-footer .user-card:hover { background: rgba(255,255,255,.07); }
+.sidebar-footer .avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; flex-shrink: 0;
+}
+.sidebar-footer .user-info { flex: 1; min-width: 0; }
+.sidebar-footer .user-info .name { font-size: .85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-footer .user-info .role { font-size: .72rem; color: var(--gray-400); }
+.sidebar-footer .logout-btn { color: var(--gray-400); padding: 6px; border-radius: 6px; transition: var(--transition); background: transparent; font-size: 1rem; }
+.sidebar-footer .logout-btn:hover { color: var(--red); background: rgba(239,68,68,.12); }
+
+/* ========== MAIN CONTENT ========== */
+.main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+    height: var(--header-h); background: #fff; border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center; padding: 0 28px; gap: 16px; position: sticky; top: 0; z-index: 50;
+}
+.topbar .menu-toggle { display: none; background: none; font-size: 1.3rem; color: var(--gray-600); }
+.topbar h3 { font-size: 1.1rem; font-weight: 600; flex: 1; }
+.topbar .top-actions { display: flex; align-items: center; gap: 14px; }
+.topbar .top-actions .notif-btn {
+    position: relative; background: var(--gray-100); width: 38px; height: 38px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: var(--gray-600); transition: var(--transition); font-size: 1rem;
+}
+.topbar .top-actions .notif-btn:hover { background: var(--primary-light); color: var(--primary); }
+.topbar .top-actions .notif-btn .badge {
+    position: absolute; top: -2px; right: -2px; width: 18px; height: 18px;
+    background: var(--red); color: #fff; font-size: .6rem; font-weight: 700;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+}
+.page-content { flex: 1; padding: 28px; }
+
+/* ========== PAGE COMMON ========== */
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.page-header h2 { font-size: 1.4rem; font-weight: 700; color: var(--gray-900); }
+.page-header p { color: var(--gray-500); font-size: .88rem; margin-top: 2px; }
+
+/* ========== STATS CARDS ========== */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+    background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 16px;
+}
+.stat-card .icon {
+    width: 48px; height: 48px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+}
+.stat-card .icon.blue { background: var(--primary-light); color: var(--primary); }
+.stat-card .icon.green { background: #d1fae5; color: #059669; }
+.stat-card .icon.amber { background: #fef3c7; color: #d97706; }
+.stat-card .icon.purple { background: #ede9fe; color: #7c3aed; }
+.stat-card .info h4 { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.stat-card .info p { font-size: .8rem; color: var(--gray-500); }
+
+/* ========== CARDS ========== */
+.card {
+    background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 24px; margin-bottom: 20px;
+}
+.card-title { font-size: 1rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+/* ========== TABLES ========== */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+table th { text-align: left; padding: 12px 14px; font-weight: 600; color: var(--gray-500); font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; border-bottom: 2px solid var(--gray-200); white-space: nowrap; }
+table td { padding: 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+table tr:hover td { background: var(--gray-50); }
+.status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 20px; font-size: .78rem; font-weight: 600;
+}
+.status-badge.approved { background: #d1fae5; color: #065f46; }
+.status-badge.pending { background: #fef3c7; color: #92400e; }
+.status-badge.reviewing { background: #dbeafe; color: #1e40af; }
+.status-badge.rejected { background: #fee2e2; color: #991b1b; }
+
+/* ========== BUTTONS ========== */
+.btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px;
+    border-radius: var(--radius-sm); font-size: .85rem; font-weight: 600; transition: var(--transition);
+}
+.btn-sm { padding: 6px 12px; font-size: .8rem; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline { background: transparent; color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-ghost { background: transparent; color: var(--gray-500); padding: 6px 10px; }
+.btn-ghost:hover { background: var(--gray-100); color: var(--gray-700); }
+
+/* ========== EVALUATION FORM ========== */
+.eval-criteria { display: flex; flex-direction: column; gap: 20px; }
+.criterion {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 18px; background: var(--gray-50); border-radius: var(--radius-sm);
+    border-left: 4px solid var(--primary);
+}
+.criterion .c-info { flex: 1; }
+.criterion .c-info h4 { font-size: .9rem; font-weight: 600; margin-bottom: 2px; }
+.criterion .c-info p { font-size: .8rem; color: var(--gray-500); }
+.criterion .c-score { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.criterion .c-score input { width: 72px; text-align: center; padding: 8px; font-weight: 600; }
+.criterion .c-score .max { font-size: .8rem; color: var(--gray-400); }
+.criterion .c-info textarea { margin-top: 8px; min-height: 50px; font-size: .85rem; }
+
+/* ========== PROJECT DETAIL MODAL ========== */
+.modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+    background: #fff; border-radius: 16px; width: 680px; max-width: 100%;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,.25);
+    padding: 32px;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.modal-header h3 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.modal-close { background: none; font-size: 1.4rem; color: var(--gray-400); transition: var(--transition); }
+.modal-close:hover { color: var(--gray-700); }
+.modal-body .detail-row { display: flex; gap: 8px; margin-bottom: 10px; font-size: .9rem; }
+.modal-body .detail-row strong { min-width: 120px; color: var(--gray-500); font-weight: 500; }
+
+/* ========== NOTIFICATIONS LIST ========== */
+.notif-list { display: flex; flex-direction: column; gap: 6px; }
+.notif-item {
+    display: flex; gap: 14px; padding: 16px 18px; border-radius: var(--radius-sm);
+    background: #fff; border: 1px solid var(--gray-100); transition: var(--transition);
+}
+.notif-item:hover { border-color: var(--gray-200); box-shadow: var(--shadow); }
+.notif-item .notif-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem;
+}
+.notif-item .notif-icon.info { background: var(--primary-light); color: var(--primary); }
+.notif-item .notif-icon.warn { background: #fef3c7; color: #d97706; }
+.notif-item .notif-icon.success { background: #d1fae5; color: #059669; }
+.notif-item .notif-body { flex: 1; }
+.notif-item .notif-body h4 { font-size: .88rem; font-weight: 600; }
+.notif-item .notif-body p { font-size: .82rem; color: var(--gray-500); margin-top: 2px; }
+.notif-item .notif-body .time { font-size: .75rem; color: var(--gray-400); margin-top: 4px; display: block; }
+.notif-item.unread { background: var(--primary-light); border-color: transparent; }
+
+/* ========== PROFILE ========== */
+.profile-header {
+    display: flex; gap: 24px; align-items: center; padding: 24px;
+    background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px;
+}
+.profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.profile-header .p-info h3 { font-size: 1.2rem; font-weight: 700; }
+.profile-header .p-info p { color: var(--gray-500); font-size: .88rem; display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ========== EMPTY STATE ========== */
+.empty-state { text-align: center; padding: 40px; color: var(--gray-400); }
+.empty-state i { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 820px) {
+    .sidebar { position: fixed; inset: 0; width: 270px; transform: translateX(-100%); height: 100vh; }
+    .sidebar.open { transform: translateX(0); }
+    .topbar .menu-toggle { display: block; }
+    .profile-form { grid-template-columns: 1fr; }
+    .modal { padding: 24px 18px; }
+}
+@media (max-width: 540px) {
+    .page-content { padding: 16px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .login-card { padding: 32px 24px 28px; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .criterion { flex-direction: column; }
+    .criterion .c-score { width: 100%; justify-content: flex-end; }
+    .page-header { flex-direction: column; }
+}
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon"><i class="fas fa-flask"></i></div>
+            <div>
+                <h2>Feira Tech MCM</h2>
+                <span>Professor</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Principal</div>
+            <a href="dashboard.html" data-page="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="projetos.html" data-page="projects"><i class="fas fa-flask"></i> Meus Projetos</a>
+            <a href="avaliacoes.html" data-page="evaluations"><i class="fas fa-star"></i> Avaliações</a>
+
+            <div class="nav-label">Comunicação</div>
+            <a href="notificacoes.html" data-page="notifications"><i class="fas fa-bell"></i> Notificações <span class="nav-badge" data-notif-badge></span></a>
+
+            <div class="nav-label">Conta</div>
+            <a href="perfil.html" data-page="profile"><i class="fas fa-user"></i> Meu Perfil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="user-card" href="perfil.html" style="display:flex;">
+                <div class="avatar" id="sidebar-avatar">CA</div>
+                <div class="user-info">
+                    <div class="name" id="sidebar-name">Prof. Carlos Almeida</div>
+                    <div class="role">Orientador</div>
+                </div>
+            </a>
+            <button class="logout-btn" id="logout-btn" title="Sair"><i class="fas fa-right-from-bracket"></i></button>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+            <h3>Notificações</h3>
+            <div class="top-actions">
+                <a class="notif-btn" href="notificacoes.html">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" data-notif-badge></span>
+                </a>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="page-header">
+                <div>
+                    <h2>Notificações</h2>
+                    <p>Comunicados e avisos da comissão organizadora</p>
+                </div>
+                <button class="btn btn-outline btn-sm" id="mark-all-btn"><i class="fas fa-check-double"></i> Marcar todas como lidas</button>
+            </div>
+            <div class="notif-list" id="notif-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==========================
+// ESTADO / DADOS (persistidos em localStorage para manter
+// a navegação entre as telas separadas do site)
+// ==========================
+const STORAGE_KEY = 'feiraTechMCM_state';
+
+const DEFAULT_STATE = {
+    loggedIn: false,
+    professor: {
+        name: 'Carlos Almeida',
+        email: 'carlos.almeida@etecmcm.sp.gov.br',
+        phone: '(11) 99999-8888',
+        discipline: 'Desenvolvimento de Sistemas',
+        bio: 'Professor de Desenvolvimento de Sistemas na ETEC Maria Cristina Medeiros. Orientador de projetos de inovação tecnológica e sustentabilidade.',
+        role: 'Orientador'
+    },
+    projects: [
+        {
+            id: 1, name: 'Farm Bot', category: 'Tecnologia', team: ['Ana Souza', 'Bruno Lima', 'Carla Dias'],
+            estande: 'A-01', status: 'approved', icon: 'fa-robot',
+            desc: 'Robô autônomo para monitoramento de cultivos agrícolas utilizando sensores IoT e inteligência artificial.',
+            orientador: 'Carlos Almeida'
+        },
+        {
+            id: 2, name: 'Eco Filter', category: 'Sustentabilidade', team: ['Daniel Rocha', 'Elena Martins'],
+            estande: 'B-03', status: 'approved', icon: 'fa-droplet',
+            desc: 'Sistema de filtragem ecológica de águas residuais utilizando carvão ativado e materiais recicláveis.',
+            orientador: 'Carlos Almeida'
+        },
+        {
+            id: 3, name: 'App Recicla', category: 'Sustentabilidade', team: ['Fernanda Costa', 'Gabriel Santos', 'Helena Oliveira'],
+            estande: 'B-07', status: 'pending', icon: 'fa-recycle',
+            desc: 'Aplicativo mobile que gamifica a coleta seletiva, conectando moradores a pontos de reciclagem.',
+            orientador: 'Carlos Almeida'
+        },
+        {
+            id: 4, name: 'Edu+', category: 'Inovação', team: ['Igor Nunes', 'Julia Pereira'],
+            estande: 'C-02', status: 'approved', icon: 'fa-book-open',
+            desc: 'Plataforma adaptativa de reforço escolar com recomendações personalizadas baseadas no desempenho do aluno.',
+            orientador: 'Carlos Almeida'
+        }
+    ],
+    evaluations: [
+        { id: 1, projectId: 3, status: 'pending' },
+        { id: 2, projectId: 1, status: 'completed', scores: { criatividade: 9, tecnico: 10, sustentabilidade: 9, apresentacao: 9, impacto: 9 }, comment: 'Excelente projeto com grande potencial de aplicação.' },
+        { id: 3, projectId: 2, status: 'completed', scores: { criatividade: 9, tecnico: 8, sustentabilidade: 10, apresentacao: 8, impacto: 8 }, comment: 'Solução criativa e bem executada.' }
+    ],
+    notifications: [
+        { id: 1, type: 'info', icon: 'fa-calendar-check', title: 'Credenciamento de Avaliadores', body: 'O credenciamento dos professores avaliadores será no dia 10 de novembro, às 8h, no auditório central. Não se esqueça de levar seu documento com foto.', time: 'Hoje, 09:30', unread: true },
+        { id: 2, type: 'warn', icon: 'fa-clock', title: 'Prazo de Avaliações Próximo do Fim', body: 'As avaliações técnicas devem ser registradas até o dia 15/11. Atualmente você possui avaliações pendentes.', time: 'Ontem, 16:45', unread: true },
+        { id: 3, type: 'success', icon: 'fa-circle-check', title: 'Projeto "Farm Bot" Aprovado', body: 'O projeto Farm Bot sob sua orientação foi aprovado pela comissão organizadora. Parabéns à equipe.', time: '3 dias atrás', unread: true },
+        { id: 4, type: 'info', icon: 'fa-pen', title: 'Alteração no Cronograma', body: 'A palestra de abertura foi remarcada para as 10h. O restante do cronograma permanece inalterado.', time: '5 dias atrás', unread: false },
+        { id: 5, type: 'info', icon: 'fa-file-lines', title: 'Manual do Avaliador Disponível', body: 'O manual com os critérios de avaliação e orientações está disponível na área de documentos.', time: '1 semana atrás', unread: false }
+    ]
+};
+
+const EVAL_CRITERIA = [
+    { key: 'criatividade', label: 'Criatividade e Inovação', desc: 'Originalidade da solução proposta.', max: 10 },
+    { key: 'tecnico', label: 'Qualidade Técnica', desc: 'Domínio técnico e execução do projeto.', max: 10 },
+    { key: 'sustentabilidade', label: 'Sustentabilidade', desc: 'Contribuição para práticas sustentáveis.', max: 10 },
+    { key: 'apresentacao', label: 'Apresentação', desc: 'Clareza, organização e domínio da equipe.', max: 10 },
+    { key: 'impacto', label: 'Impacto Social', desc: 'Potencial de transformação na comunidade.', max: 10 }
+];
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(DEFAULT_STATE);
+        const parsed = JSON.parse(raw);
+        return Object.assign(structuredClone(DEFAULT_STATE), parsed);
+    } catch (e) {
+        return structuredClone(DEFAULT_STATE);
+    }
+}
+function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let STATE = loadState();
+
+// ==========================
+// AUTENTICAÇÃO / GUARDA DE ROTA
+// ==========================
+function requireAuth() {
+    STATE = loadState();
+    if (!STATE.loggedIn) {
+        window.location.href = 'login.html';
+    }
+}
+function logout() {
+    STATE.loggedIn = false;
+    saveState(STATE);
+    window.location.href = 'login.html';
+}
+
+function initials(name) {
+    return name.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+// ==========================
+// CABEÇALHO / BARRA LATERAL (compartilhados entre telas)
+// ==========================
+function renderShell(activePage) {
+    const p = STATE.professor;
+    const unread = STATE.notifications.filter(n => n.unread).length;
+
+    const nameEl = document.getElementById('sidebar-name');
+    const avatarEl = document.getElementById('sidebar-avatar');
+    if (nameEl) nameEl.textContent = 'Prof. ' + p.name;
+    if (avatarEl) avatarEl.textContent = initials(p.name);
+
+    const badgeEls = document.querySelectorAll('[data-notif-badge]');
+    badgeEls.forEach(el => {
+        if (unread > 0) { el.textContent = unread; el.classList.remove('hidden'); }
+        else { el.classList.add('hidden'); }
+    });
+
+    document.querySelectorAll('.sidebar-nav a[data-page]').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === activePage);
+    });
+
+    const toggle = document.querySelector('.menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (window.innerWidth <= 820 && sidebar.classList.contains('open') &&
+                !sidebar.contains(e.target) && !e.target.closest('.menu-toggle')) {
+                sidebar.classList.remove('open');
+            }
+        });
+    }
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+}
+
+// ==========================
+// MODAL: DETALHES DO PROJETO
+// ==========================
+function viewProject(id) {
+    const p = STATE.projects.find(x => x.id === id);
+    if (!p) return;
+    const statusLabel = p.status === 'approved' ? 'Aprovado' : 'Pendente';
+    document.getElementById('modal-title').innerHTML = `<i class="fas ${p.icon}" style="color:var(--primary);"></i> ${p.name}`;
+    document.getElementById('modal-body').innerHTML = `
+        <div class="detail-row"><strong>Categoria:</strong> ${p.category}</div>
+        <div class="detail-row"><strong>Estande:</strong> ${p.estande}</div>
+        <div class="detail-row"><strong>Orientador:</strong> ${p.orientador}</div>
+        <div class="detail-row"><strong>Status:</strong> <span class="status-badge ${p.status === 'approved' ? 'approved' : 'pending'}">${statusLabel}</span></div>
+        <div style="margin-top:12px;">
+            <strong>Descrição:</strong>
+            <p style="color:var(--gray-600);margin-top:4px;line-height:1.5;">${p.desc}</p>
+        </div>
+        <div style="margin-top:16px;">
+            <strong>Equipe (${p.team.length}):</strong>
+            <ul style="margin-top:6px;padding-left:20px;color:var(--gray-600);">
+                ${p.team.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+        </div>
+    `;
+    document.getElementById('project-modal').classList.add('open');
+}
+function closeModal() {
+    const m = document.getElementById('project-modal');
+    if (m) m.classList.remove('open');
+}
+
+// ==========================
+// MODAL: AVALIAÇÃO
+// ==========================
+function openEval(projectId) {
+    const p = STATE.projects.find(x => x.id === projectId);
+    if (!p) return;
+    const evalData = STATE.evaluations.find(e => e.projectId === projectId);
+    const isDone = evalData && evalData.status === 'completed';
+
+    document.getElementById('eval-modal-title').innerHTML =
+        `<i class="fas ${p.icon}" style="color:var(--primary);"></i> ${isDone ? 'Avaliação de' : 'Avaliar'} ${p.name}`;
+
+    const criteriaHTML = EVAL_CRITERIA.map(c => {
+        const val = (evalData && evalData.scores && evalData.scores[c.key] !== undefined) ? evalData.scores[c.key] : '';
+        return `
+        <div class="criterion">
+            <div class="c-info">
+                <h4>${c.label}</h4>
+                <p>${c.desc}</p>
+                <textarea placeholder="Comentário opcional para este critério..." ${isDone ? 'disabled' : ''}>${isDone && evalData.comment ? evalData.comment : ''}</textarea>
+            </div>
+            <div class="c-score">
+                <input type="number" min="0" max="${c.max}" step="0.5" value="${val}" placeholder="0" ${isDone ? 'disabled' : ''}>
+                <span class="max">/ ${c.max}</span>
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('eval-modal-body').innerHTML = `
+        <p style="font-size:.88rem;color:var(--gray-500);margin-bottom:16px;">
+            <strong>Projeto:</strong> ${p.name} &middot; <strong>Equipe:</strong> ${p.team.join(', ')} &middot; <strong>Estande:</strong> ${p.estande}
+        </p>
+        <div class="eval-criteria">${criteriaHTML}</div>
+        <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+            ${!isDone ? `<button class="btn btn-success" id="submit-eval-btn"><i class="fas fa-check"></i> Registrar Avaliação</button>` : ''}
+            <button class="btn btn-outline" id="close-eval-btn">Fechar</button>
+        </div>
+    `;
+    if (!isDone) {
+        document.getElementById('submit-eval-btn').addEventListener('click', () => submitEval(projectId));
+    }
+    document.getElementById('close-eval-btn').addEventListener('click', closeEvalModal);
+    document.getElementById('eval-modal').classList.add('open');
+}
+
+function submitEval(projectId) {
+    const criteriaInputs = document.querySelectorAll('#eval-modal-body .criterion');
+    const scores = {};
+    let valid = true;
+    criteriaInputs.forEach((el, i) => {
+        const input = el.querySelector('input');
+        const key = EVAL_CRITERIA[i].key;
+        const val = parseFloat(input.value);
+        if (isNaN(val) || val < 0 || val > EVAL_CRITERIA[i].max) valid = false;
+        scores[key] = val;
+    });
+    if (!valid) { alert('Preencha todas as notas com valores válidos (0 a 10).'); return; }
+
+    let evalData = STATE.evaluations.find(e => e.projectId === projectId);
+    if (!evalData) {
+        evalData = { id: STATE.evaluations.length + 1, projectId, status: 'completed', scores: {}, comment: '' };
+        STATE.evaluations.push(evalData);
+    }
+    evalData.status = 'completed';
+    evalData.scores = scores;
+    evalData.comment = 'Avaliação registrada com sucesso.';
+    saveState(STATE);
+
+    alert('Avaliação registrada com sucesso.');
+    closeEvalModal();
+    if (typeof renderEvaluations === 'function') renderEvaluations();
+    if (typeof renderDashboardStats === 'function') renderDashboardStats();
+}
+function closeEvalModal() {
+    const m = document.getElementById('eval-modal');
+    if (m) m.classList.remove('open');
+}
+
+function wireModalOverlays() {
+    const pm = document.getElementById('project-modal');
+    if (pm) pm.addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+    const em = document.getElementById('eval-modal');
+    if (em) em.addEventListener('click', e => { if (e.target === e.currentTarget) closeEvalModal(); });
+    const mc1 = document.getElementById('modal-close-btn');
+    if (mc1) mc1.addEventListener('click', closeModal);
+    const mc2 = document.getElementById('eval-modal-close-btn');
+    if (mc2) mc2.addEventListener('click', closeEvalModal);
+}
+
+    </script>
+<script>
+    requireAuth();
+
+    function renderNotifications() {
+        const list = document.getElementById('notif-list');
+        list.innerHTML = STATE.notifications.map(n => `
+            <div class="notif-item ${n.unread ? 'unread' : ''}">
+                <div class="notif-icon ${n.type}"><i class="fas ${n.icon}"></i></div>
+                <div class="notif-body">
+                    <h4>${n.title}</h4>
+                    <p>${n.body}</p>
+                    <span class="time"><i class="far fa-clock"></i> ${n.time}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('mark-all-btn').addEventListener('click', () => {
+        STATE.notifications.forEach(n => n.unread = false);
+        saveState(STATE);
+        renderShell('notifications');
+        renderNotifications();
+    });
+
+    renderShell('notifications');
+    renderNotifications();
+</script>
+</body>
+</html>
