@@ -440,13 +440,14 @@ let STATE = loadState();
 function requireAuth() {
     STATE = loadState();
     if (!STATE.loggedIn) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html'; // CORRIGIDO: de login.html para index.html
     }
 }
+
 function logout() {
     STATE.loggedIn = false;
     saveState(STATE);
-    window.location.href = 'login.html';
+    window.location.href = 'index.html'; // CORRIGIDO: de login.html para index.html
 }
 
 function initials(name) {
